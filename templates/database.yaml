@@ -1,0 +1,29 @@
+{{- if and (eq .Values.database.type "postgres") (.Values.database.create) -}}
+apiVersion: postgresql.org/v1
+kind: PostgresDatabase
+metadata:
+  name: {{ .Release.Name }}-db
+  namespace: {{ .Release.Namespace }}
+spec:
+  dbName:
+    envFrom:
+      configMapKeyRef:
+        - name: {{ .Release.Name }}-db-credentials
+          namespace: postgres-controller
+          key: db-name
+  dbRoleName:
+    envFrom:
+      configMapKeyRef:
+        - name: {{ .Release.Name }}-db-credentials
+          namespace: postgres-controller
+          key: db-user
+  dbRolePassword:
+    envFrom:
+      secretKeyRef:
+        - name: {{ .Release.Name }}-db-password
+          namespace: postgres-controller
+          key: password
+{{- if .Values.database.instance_id }}
+  dbInstanceId: {{ .Values.database.instance_id }}
+{{- end }}
+{{- end -}}

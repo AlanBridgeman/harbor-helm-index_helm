@@ -1,0 +1,8 @@
+# Mac OS
+.DS_Store
+
+# Input file
+input.json
+
+# Ignore the Helm chart's packaged tarball
+*.tgz

@@ -1,0 +1,15 @@
+{{- if and (eq .Values.cache.type "redis") (.Values.cache.create) -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-redis
+  labels:
+    app: redis
+spec:
+  ports:
+    - port: {{ .Values.cache.port }}
+      targetPort: {{ .Values.cache.port }}
+  selector:
+    app: redis
+  type: ClusterIP
+{{- end -}}

@@ -1,0 +1,49 @@
+{{- if and (eq .Values.cache.type "redis") (.Values.cache.create) -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-redis
+  labels:
+    app: redis
+spec:
+  replicas: {{ .Values.cache.replicaCount }}
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: {{ .Values.cache.image.repository | default "bitnami/redis" }}:{{ .Values.cache.image.tag | default "7.0.5" }}
+          ports:
+            - containerPort: {{ .Values.cache.port }}
+            {{- if .Values.cache.tls.enabled }}
+            - containerPort: {{ .Values.cache.tls.port }}
+            {{- end }}
+          env:
+            - name: ALLOW_EMPTY_PASSWORD
+              value: "false"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-cache-credentials
+                  key: password
+            - name: REDIS_DISABLE_COMMANDS
+              value: "FLUSHDB,FLUSHALL"
+            # TLS configuration
+            #- name: REDIS_TLS_ENABLED
+            #  value: "{{ .Values.cache.tls.enabled }}"
+            #- name: REDIS_TLS_AUTH_CLIENTS
+            #  value: "yes"
+            #- name: REDIS_TLS_PORT_NUMBER
+            #  value: "{{ .Values.cache.tls.port }}"
+          volumeMounts:
+            - name: redis-data
+              mountPath: /bitnami/redis
+      volumes:
+        - name: redis-data
+          emptyDir: {}
+{{- end -}}

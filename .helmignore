@@ -1,0 +1,8 @@
+# Ignore the ignore file
+.helmignore
+# Ignore the Helm chart's packaged tarball
+*.tgz
+# Ignore git files
+*.git
+# Ignore the input file
+input.json

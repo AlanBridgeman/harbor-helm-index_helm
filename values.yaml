@@ -1,0 +1,105 @@
+# The number of instances (replicas) of the app to run
+replicaCount: 1
+
+image:
+  # The repository of the image to use for the app
+  # Should be in the format `<Image Repository (Ex. containers.example.com)>/<Image Name (Ex. app)>`
+  repository: "<private repository>/harbor-helm-index"
+  # The specific image tag to use. It's recommended to use some kind of versioning tag scheme as it makes updating the container without having to fully redeploy easier.
+  # Ex. v1.0.0
+  tag: "v1.0.0"
+  # How often the image should be pulled. The possible values are "Always", "Never", and "IfNotPresent"
+  # It's recommended for production to use "IfNotPresent" to avoid pulling the image every time the pod starts
+  # Though, for development, "Always" is recommended to ensure the latest changes are being tested
+  pullPolicy: "IfNotPresent"
+
+container:
+  # The port that the container listens on (Ex. 8080)
+  port: 8080
+  
+  # The environment that the container is running in (Ex. development, production, etc...)
+  # This is used for the NODE_ENV environment variable
+  env: "production"
+
+ingress:
+  # We want an ingress resource if we are deploying to a cluster that has a ingress controller/load balancer
+  # This includes most public cloud providers like EKS, GKE, and AKS
+  enabled: true
+  # The DNS Name (Ex. helm.example.com) where the app will be accessible
+  host: "helm.example.com"
+  # The class of the ingress controller that is being used (defaulted here to an NGINX ingress controller as it's popular for Kubernetes clusters)
+  class: nginx
+
+
+
+
+# Configuration for the relational database
+database:
+  # The type of the relational database that is used.
+  # 
+  # The following table lists the possible values for this field:
+  # 
+  # | Value      | Description                                |
+  # | ---------- | ------------------------------------------ |
+  # | `postgres` | Uses PostgreSQL as the relational database |
+  # 
+  # Note, for use of `postgres`, it uses a [`postgres-controller` CRD](https://github.com/AlanBridgeman/postgres-controller) to create the database
+  # 
+  type: "postgres"
+  
+  # If set to `true`, the database will be created as part of the deployment
+  # This uses the [`postgres-controller` CRD](https://github.com/AlanBridgeman/postgres-controller) to create the database
+  create: true
+  
+  # The host that the database is located on 
+  host: "<Database Hostname>"
+  
+  # The name of the database to be used
+  name: "<Database Name>"
+  
+  # The user that is used to access the database
+  user: "<Database User>"
+  
+  # The password that is used to access the database
+  password: "<Database Password>"
+  
+  # The port that the database listens on
+  #port: 5432
+  
+  # Allows for distinguishing between multiple database instances/servers
+  #instance_id: ""
+
+# Configuration for cache server
+cache:
+  type: "redis"
+  
+  # If to create a Redis instance/resource as part of the deployment process
+  create: true
+  
+  # The image to use for the Redis instance
+  # ONLY relevant if `create` is set to `true`
+  image: {}
+  
+  # The number of replicas of the Redis instance
+  # ONLY relevant if `create` is set to `true`
+  replicaCount: 1
+  
+  # Hostname of the Redis server
+  # ONLY relevant if `create` is set to `false`
+  #hostName: "<Redis Host Name>"
+  
+  # The password to use for the Redis server
+  password: "<Redis Password>"
+  
+  # The port of the Redis server
+  port: "6379"
+  
+  # Redis TLS Configurations
+  tls:
+    # If TLS is enabled for the Redis instance
+    enabled: false
+    
+    # The port of the Redis instance for TLS
+    # ONLY relevant if `tls.enabled` is set to `true`
+    #port: "<TLS Port (Ex. 6380)>"
+  

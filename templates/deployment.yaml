@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: {{ .Release.Name }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.container.port }}
+        env:
+        - name: NODE_ENV
+          value: {{ .Values.container.env }}
+        - name: PORT
+          value: "{{ .Values.container.port }}"
+        - name: COMPANY
+          value: "Bridgeman Accessible"
+        - name: WEBSITE_TITLE_SUFFIX
+          value: " - Bridgeman Accessible Helm Repo"
+        - name: HOSTNAME
+          value: "helm.bridgemanaccessible.ca"
+        # Database credentials
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Release.Name }}-db-credentials
+              key: db-host
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Release.Name }}-db-credentials
+              key: db-name
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-db-password
+              key: password
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Release.Name }}-db-credentials
+              key: db-port
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Release.Name }}-db-credentials
+              key: db-user
+        # Caching Server Variables
+        - name: CACHE_HOSTNAME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Release.Name }}-cache-configmap
+              key: hostname
+        - name: CACHE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Release.Name }}-cache-configmap
+              key: port
+        - name: CACHE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-cache-credentials
+              key: password
